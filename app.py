@@ -10,14 +10,13 @@ import numpy as np
 from textwrap import dedent
 
 import config
-import utils
 
 ################
 # DATA LOADING #
 ################
 
 kluby = pd.read_hdf(config.FILE_KLUBY)
-sorted_names = sorted(kluby.index, key=utils.change_name_order)
+sorted_names = sorted(kluby.index, key=lambda x: " ".join(x.split(" ")[::-1]))
 hlasy = {vysledok: pd.read_hdf(config.FILE_STATS_HLASY_PIE, vysledok)
          for vysledok in config.HLASY_STATS_VYSLEDOK}
 dg = pd.read_hdf(config.FILE_DEMAGOG_PIE)
