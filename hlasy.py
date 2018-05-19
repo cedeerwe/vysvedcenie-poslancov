@@ -178,7 +178,7 @@ class Hlasovanie:
         """Store metadata of hlasovanie processed by get_metadata."""
         if os.path.isfile(config.FILE_HLASY_METADATA):
             df = pd.read_hdf(config.FILE_HLASY_METADATA)
-            df.loc[self.id] = self.metadata
+            df.loc[self.id, self.metadata.index] = self.metadata
         else:
             df = pd.DataFrame(dict(self.metadata), index=[self.id])
         df.to_hdf(config.FILE_HLASY_METADATA, config.HDF_KEY, format="table")
