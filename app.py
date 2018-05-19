@@ -55,7 +55,7 @@ def pie_hlasy(name, vysledok):
     trace = go.Pie(labels=labels, values=values, sort=False)
     layout = go.Layout(
         title="Hlasovanie v {} prípadoch keď návrh {}".format(
-            np.sum(values), vysledok)
+            int(np.sum(values)), vysledok)
     )
     return {"data": [trace], "layout": layout}
 
