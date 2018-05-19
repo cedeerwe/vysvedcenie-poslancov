@@ -23,6 +23,7 @@ hlasy = {vysledok: pd.read_hdf(config.FILE_STATS_HLASY_PIE, vysledok)
 #####################
 
 app = dash.Dash()
+server = app.server
 
 app.layout = html.Div([
     dcc.Dropdown(
@@ -77,3 +78,6 @@ def plot_positives(name):
 )
 def plot_negatives(name):
     return pie_hlasy(name, config.HLASY_STATS_VYSLEDOK[1])
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
