@@ -13,3 +13,10 @@ conda install -c conda-forge dash-core-components
 conda install -c conda-forge dash-html-components
 conda install -c plotly plotly
 ```
+
+## Dashboard
+Once all the dependencies are installed, the dashboard can be started by running:
+```
+python main.py
+```
+Open up the browser at `localhost:8050` and enjoy :)
