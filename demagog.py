@@ -1,4 +1,6 @@
 import utils
+import config
+
 import numpy as np
 from time import sleep
 import pandas as pd
@@ -44,10 +46,10 @@ class Scraper:
         all_stats = []
         for i in range(self.n_poslanci):
             all_stats.append(self.get_poslanec_stats(i))
-            sleep(1)  # scrape so that the server is not overloaded
+            sleep(config.DELAY)  # scrape so that the server is not overloaded
             print(all_stats[-1]["Meno"] + " done! Total progress {}/{}".format(
                 i + 1, self.n_poslanci
             ))
         self.stats = pd.DataFrame(all_stats)
-        self.stats.to_pickle("data/demagog.pkl")
-        print("Data stored to data/demagog.pkl")
+        self.stats.to_hdf(config.FILE_DEMAGOG, config.HDF_KEY, format="table")
+        print("Data stored to {}".format(config.FILE_DEMAGOG))

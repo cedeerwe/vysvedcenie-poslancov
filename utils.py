@@ -51,3 +51,10 @@ def remove_multiple_spaces(s):
         s = new_s
         new_s = s.replace("  ", " ")
     return s
+
+
+def change_name_order(name):
+    """Change surname, name representation to name surname. Discard commas."""
+    delimiter = "," if "," in name else " "
+    names = [s.strip() for s in name.split(delimiter)]
+    return " ".join(names[::-1])
