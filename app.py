@@ -10,12 +10,14 @@ import numpy as np
 from textwrap import dedent
 
 import config
+import utils
 
 ################
 # DATA LOADING #
 ################
 
 kluby = pd.read_hdf(config.FILE_KLUBY)
+sorted_names = sorted(kluby.index, key=utils.change_name_order)
 hlasy = {vysledok: pd.read_hdf(config.FILE_STATS_HLASY_PIE, vysledok)
          for vysledok in config.HLASY_STATS_VYSLEDOK}
 dg = pd.read_hdf(config.FILE_DEMAGOG_PIE)
@@ -32,8 +34,8 @@ app.layout = html.Div([
         options=[{
             "label": "{} ({})".format(name, kluby[name]),
             "value": name
-        } for name in kluby.index],
-        value=kluby.index[0],
+        } for name in sorted_names],
+        value=sorted_names[0],
         id="poslanec_selection",
         clearable=False
     ),
