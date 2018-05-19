@@ -34,7 +34,7 @@ class Scraper:
         stats["Klub"] = utils.remove_multiple_spaces(texts[1].strip()[:-1])
         counts = [int(s.text.strip())
                   for s in pol("span", attrs={"class": "veracityNumber"})]
-        labels = ["Pravda", "Nepravda", "Zavádzanie", "Neoveriteľné"]
+        labels = config.DEMAGOG_LABELS
         for c, l in zip(counts, labels):
             stats[l] = c
         stats["Total"] = np.sum(counts)

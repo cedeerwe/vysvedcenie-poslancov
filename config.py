@@ -10,3 +10,6 @@ HLASY_STATS_MEANING = {"[Z]": "Za", "[P]": "Proti", "[N]": "Nehlasoval/a",
 HLASY_STATS_ORDER = ["[Z]", "[P]", "[?]", "[0]", "[N]"]
 HLASY_STATS_VYSLEDOK = ["prešiel", "neprešiel"]
 FILE_STATS_HLASY_PIE = "data/hlasy_pie.h5"
+
+DEMAGOG_LABELS = ["Pravda", "Nepravda", "Zavádzanie", "Neoveriteľné"]
+FILE_DEMAGOG_PIE = "data/demagog_pie.h5"

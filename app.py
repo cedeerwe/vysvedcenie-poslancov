@@ -7,6 +7,7 @@ import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
 
+from textwrap import dedent
 
 import config
 
@@ -17,6 +18,7 @@ import config
 kluby = pd.read_hdf(config.FILE_KLUBY)
 hlasy = {vysledok: pd.read_hdf(config.FILE_STATS_HLASY_PIE, vysledok)
          for vysledok in config.HLASY_STATS_VYSLEDOK}
+dg = pd.read_hdf(config.FILE_DEMAGOG_PIE)
 
 #####################
 # APP SPECIFICATION #
@@ -36,11 +38,31 @@ app.layout = html.Div([
         clearable=False
     ),
     html.Div([
-        dcc.Graph(id="pie_positive")
-    ], style={"width": "49%", "display": "inline-block"}),
+        dcc.Markdown(dedent("""
+                     ## Štatistiky z hlasovaní v parlamente
+                     Nasledujúce grafy vznikli spracovaním dát zo stránky
+                     [nrsr.sk](
+                     https://www.nrsr.sk/web/default.aspx?SectionId=108).
+                     """))], style={"align": "center"}),
     html.Div([
-        dcc.Graph(id="pie_negative")
-    ], style={"width": "49%", "display": "inline-block"})
+        html.Div([
+            dcc.Graph(id="pie_positive")
+            ], style={"width": "49%", "display": "inline-block"}),
+            html.Div([
+            dcc.Graph(id="pie_negative")
+            ], style={"width": "49%", "display": "inline-block"})]),
+    html.Div([
+        dcc.Markdown(dedent("""
+                     ## Štatistiky pravdivosti výrokov v politických debatách
+                     Údaje v grafoch sú prevzaté zo stránky [demagog.sk](
+                     http://www.demagog.sk/).
+                     """))], style={"align": "center"}),
+    html.Div(id="graph_demagog", children=[
+        dcc.Graph(id="pie_demagog"),
+        ]),
+    html.Div(id="replacement_text_demagog", children=[
+        html.P("Nie sú registrované žiadne vystúpenia v debatách."),
+    ])
 ])
 
 ######################
@@ -56,6 +78,19 @@ def pie_hlasy(name, vysledok):
     layout = go.Layout(
         title="Hlasovanie v {} prípadoch keď návrh {}".format(
             int(np.sum(values)), vysledok)
+    )
+    return {"data": [trace], "layout": layout}
+
+
+def pie_demagog(name):
+    """Output the demagog data for a Plotly pie plot."""
+    values = dg[name].values
+    labels = dg.index.values
+    trace = go.Pie(labels=labels, values=values, sort=False)
+    layout = go.Layout(
+        title="Pravdivosť z {} diskusných výrokov.".format(
+            int(np.sum(values))
+        )
     )
     return {"data": [trace], "layout": layout}
 
@@ -78,6 +113,40 @@ def plot_positives(name):
 )
 def plot_negatives(name):
     return pie_hlasy(name, config.HLASY_STATS_VYSLEDOK[1])
+
+
+@app.callback(
+    Output("replacement_text_demagog", "style"),
+    [Input("poslanec_selection", "value")]
+)
+def toggle_demagog_text(name):
+    if name in dg.columns:
+        return {"display": "none"}
+    else:
+        return {"display": "block"}
+
+
+@app.callback(
+    Output("graph_demagog", "style"),
+    [Input("poslanec_selection", "value")]
+)
+def toggle_demagog_graph(name):
+    if name not in dg.columns:
+        return {"display": "none"}
+    else:
+        return {"display": "block"}
+
+
+@app.callback(
+    Output("pie_demagog", "figure"),
+    [Input("poslanec_selection", "value")]
+)
+def plot_demagog(name):
+    if name in dg.columns:
+        return pie_demagog(name)
+    else:
+        return {"data": []}
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
