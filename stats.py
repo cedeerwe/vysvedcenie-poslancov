@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import os
 
 import config
@@ -30,7 +31,7 @@ def compute_hlasy_pie_tlace():
 def prepare_pie_demagog():
     """Extract only the necessary columns and politication from demagog."""
     if not os.path.isfile(config.FILE_KLUBY):
-        print("File {} does not exist locally!".format(config.KLUBY))
+        print("File {} does not exist locally!".format(config.FILE_KLUBY))
     if not os.path.isfile(config.FILE_DEMAGOG):
         print("File {} does not exist locally!".format(
             config.FILE_DEMAGOG))
@@ -42,3 +43,26 @@ def prepare_pie_demagog():
                       columns=config.DEMAGOG_LABELS,
                       index=dg["Meno"].values).T
     df.to_hdf(config.FILE_DEMAGOG_PIE, config.HDF_KEY, format="table")
+
+
+def prepare_stats_rozpravy():
+    """Extract only the summary stats from rozpravy."""
+    if not os.path.isfile(config.FILE_ROZPRAVY):
+        print("File {} does not exist locally!".format(config.FILE_ROZPRAVY))
+    rz = pd.read_pickle(config.FILE_ROZPRAVY)
+    sts = pd.DataFrame()
+    # DURATION
+    dur = rz["end_time"] - rz["start_time"]
+    dur[dur < pd.Timedelta(0)] += pd.Timedelta(days=1)  # issue with midnight
+    rz[config.ROZPRAVY_APP_LABELS[0]] = dur
+    sts[config.ROZPRAVY_APP_LABELS[0]] = rz.groupby(["name"])[
+        config.ROZPRAVY_APP_LABELS[0]].sum()
+    dur_sort = sts[config.ROZPRAVY_APP_LABELS[0]].argsort()
+    dur_vals = sts[config.ROZPRAVY_APP_LABELS[0]][dur_sort]
+    dur_vals.to_pickle(config.FILE_ROZPRAVY_DURATION)
+
+    # N_WORDS
+    rz[config.ROZPRAVY_APP_LABELS[1]] = rz["text"].apply(
+        lambda x: len(x.split(" ")))
+    sts[config.ROZPRAVY_APP_LABELS[1]] = rz.groupby(["name"])[
+        config.ROZPRAVY_APP_LABELS[0]].sum()
