@@ -3,6 +3,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
+from plotly.colors import DEFAULT_PLOTLY_COLORS
+
 
 import pandas as pd
 import numpy as np
@@ -109,7 +111,9 @@ def pie_hlasy(name, klub, vysledok):
     else:
         values = hlasy[vysledok][name][config.HLASY_STATS_ORDER].values
     labels = [config.HLASY_STATS_MEANING[s] for s in config.HLASY_STATS_ORDER]
-    trace = go.Pie(labels=labels, values=values, sort=False)
+    trace = go.Pie(labels=labels, values=values, sort=False, marker={
+        "colors": [DEFAULT_PLOTLY_COLORS[i] for i in [2,3,0,4,1]]
+    })
     layout = go.Layout(
         title="Hlasovanie v {} prípadoch keď návrh {}".format(
             int(np.sum(values)), vysledok)
@@ -120,7 +124,9 @@ def pie_hlasy(name, klub, vysledok):
 def pie_demagog(values):
     """Output the demagog data for a Plotly pie plot."""
     labels = dg.index.values
-    trace = go.Pie(labels=labels, values=values, sort=False)
+    trace = go.Pie(labels=labels, values=values, sort=False, marker={
+        "colors": [DEFAULT_PLOTLY_COLORS[i] for i in [2, 3, 1, 0]]
+    })
     layout = go.Layout(
         title="Pravdivosť z {} diskusných výrokov.".format(
             int(np.sum(values))
@@ -141,8 +147,8 @@ def bar_rozpravy_duration(name, klub):
         title = "Celková dĺžka vystúpení v rozpravách v minutách"
     n = len(df)
     name_ind = np.arange(n)[df.index == name][0]
-    colors = ["rgba(0,0,255,0.7)"] * n
-    colors[name_ind] = "rgba(255,0,0,1)"
+    colors = [DEFAULT_PLOTLY_COLORS[0]] * n
+    colors[name_ind] = DEFAULT_PLOTLY_COLORS[3]
     ss = n * [""]
     ss[name_ind] = name
     data = [
