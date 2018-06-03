@@ -1,9 +1,10 @@
-DELAY = 1
+DELAY = 0.2
 FILE_HLASY = "data/hlasy.h5"
 FILE_KLUBY = "data/kluby.h5"
 FILE_HLASY_METADATA = "data/hlasy_metadata.h5"
 FILE_DEMAGOG = "data/demagog.h5"
 FILE_ROZPRAVY = "data/rozpravy.pkl"
+FILE_ZAKONY = "data/zakony.pkl"
 HDF_KEY = "data"
 
 HLASY_STATS_MEANING = {"[Z]": "Za", "[P]": "Proti", "[N]": "Nehlasoval/a",
