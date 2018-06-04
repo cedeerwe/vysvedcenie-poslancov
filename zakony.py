@@ -56,12 +56,31 @@ class Zakon:
         self.data["navrhovatel"] = self.soup.find("span", attrs={
             "id": "_sectionLayoutContainer_ctl01_ctl00__NavrhovatelLabel"
             }).text.strip()
+        self.parse_navrhovatel()
         self.data["stav"] = self.soup.find("span", attrs={
             "id": "_sectionLayoutContainer_ctl01__ProcessStateLabel"
             }).text.strip()
         self.data["vysledok"] = self.soup.find("span", attrs={
             "id": "_sectionLayoutContainer_ctl01__CurrentResultLabel"
             }).text.strip()[1:-1]
+
+    def parse_navrhovatel(self):
+        if "vláda" in self.data["navrhovatel"]:
+            self.data["navrhovatel"] = "vláda"
+        elif "výbor" in self.data["navrhovatel"]:
+            self.data["navrhovatel"] = "výbor"
+        elif "poslanci" in self.data["navrhovatel"]:
+            if "(" in self.data["navrhovatel"]:
+                poslanci = [
+                    s.split("\xa0")[1] for s in self.data["navrhovatel"].split(
+                        "(")[1][:-1].split(",")]
+                names = pd.read_hdf(config.FILE_KLUBY).index
+                poslanci = [names[names.str.contains(p)][0] for p in poslanci]
+                self.data["navrhovatel"] = poslanci
+            else:
+                self.data["navrhovatel"] = []
+        else:
+            self.data["navrhovatel"] = []
 
     def get_zmeny(self):
         table = self.soup.find("div", attrs={

@@ -58,3 +58,23 @@ def change_name_order(name):
     delimiter = "," if "," in name else " "
     names = [s.strip() for s in name.split(delimiter)]
     return " ".join(names[::-1])
+
+
+def parse_date_csv(str_date):
+    """Format standard date string to neo4j format."""
+    parts = str_date.split(" ")
+    day = parts[0][:-1]
+    if len(day) == 1:
+        day = "0" + day
+    month = parts[1][:-1]
+    if len(month) == 1:
+        month = "0" + month
+    year = parts[2]
+    return year + month + day
+
+
+def parse_datetime_csv(str_date):
+    """Format standard datetime string to neo4j format."""
+    res = parse_date_csv(str_date) + "T"
+    res += "".join(str_date.split(" ")[3].split(":"))
+    return res
