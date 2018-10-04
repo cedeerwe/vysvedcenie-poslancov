@@ -41,8 +41,11 @@ def process_zakony():
     zmeny_podpisani = []
     posledne_hlasovania = []
     navrhovatelia = []
+    zakon_zmena = []
     for i in zk:
         for j in zk[i]["zmeny"]:
+            zakon_zmena.append([i, j])
+
             zmena = []
             row = zk[i]["zmeny"][j]
             zmena.append(j)
@@ -84,6 +87,10 @@ def process_zakony():
         else:
             for poslanec in row["navrhovatel"]:
                 navrhovatelia.append([i, poslanec])
+
+        
+    pd.DataFrame(zakon_zmena).to_csv(config.NEO4J_ZAKONY_ZMENY_EDGES,
+                                     encoding="utf-8", header=False)
     pd.DataFrame(all_stats).to_csv(config.NEO4J_ZAKONY_NODES,
                                    encoding="utf-8", header=False)
     pd.DataFrame(zmeny).to_csv(config.NEO4J_ZMENY_NODES,
@@ -116,7 +123,6 @@ def process_kluby():
     pd.DataFrame(all_stats).to_csv(config.NEO4J_POSLANCI_KLUBY_EDGES,
                                    encoding="utf-8", header=False)
 
-
 def process_hlasovania():
     hlasy = pd.read_hdf(config.FILE_HLASY)
     all_stats = []
@@ -128,3 +134,26 @@ def process_hlasovania():
                     i, name, config.HLASY_STATS_MEANING[row[name]]])
     pd.DataFrame(all_stats).to_csv(config.NEO4J_POSLANEC_HLASOVANIE_EDGES,
                                    encoding="utf-8", header=False)
+
+
+def process_spektrum():
+    opozicia = ["ĽS Naše Slovensko", "SaS", "OĽANO", "SME RODINA",
+                "Nezaradení"]
+    koalicia = ["SNS", "MOST - HÍD", "SMER - SD", "vláda"]
+    stats = []
+    for o in opozicia:
+        stats.append(["opozícia", o])
+    for k in koalicia:
+        stats.append(["koalícia", k])
+    pd.DataFrame(stats).to_csv(config.NEO4J_KLUBY_SPEKTRUM_EDGES,
+                               encoding="utf-8", header=False)
+
+def process_rozpravy():
+    rz = pd.read_pickle(config.FILE_ROZPRAVY)
+    rz["url"] = pd.Series(rz.index, rz.index).apply(
+        lambda x: "http://tv.nrsr.sk/transcript?id={}".format(x))
+    rz["start_time"] = rz["start_time"].values.astype(str)
+    rz["end_time"] = rz["end_time"].values.astype(str)
+    del rz["text"]
+    rz.to_csv(config.NEO4J_ROZPRAVY_NODES_EDGES,
+              encoding="utf-8", header=False)

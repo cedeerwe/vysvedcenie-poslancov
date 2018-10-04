@@ -110,9 +110,10 @@ class Zakon:
         meta = meta[meta["tlac"] == self.cislo]
         if len(meta) > 0:
             self.data["posledne"] = meta["Cas"].apply(
-                lambda x: pd.to_datetime(x)).sort_values().index[-1]
+                lambda x: pd.to_datetime(x, dayfirst=True)).sort_values().index[-1]
         meta = meta["Nazov"]
         meta = meta[meta.str.contains("pozmeňujúcich a doplňujúcich")]
+        meta = meta.apply(lambda s: s.split("Hlasovanie")[-1])
         ids = sorted(self.data["zmeny"].keys())
         names = [self.data["zmeny"][i]["poslanec"] for i in ids]
         counts = [0] * len(ids)
